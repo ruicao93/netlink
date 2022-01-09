@@ -3459,3 +3459,28 @@ func parseBareUDPData(link Link, data []syscall.NetlinkRouteAttr) {
 		}
 	}
 }
+
+// LinkSetOperStateUp sets the operation state of the link device to up.
+func LinkSetOperStateUp(link Link) error {
+	return pkgHandle.LinkSetOperStateUp(link)
+}
+
+// LinkSetOperStateUp sets the operation state of the link device to up.
+func (h *Handle) LinkSetOperStateUp(link Link) error {
+	base := link.Attrs()
+	h.ensureIndex(base)
+	req := h.newNetlinkRequest(unix.RTM_SETLINK, unix.NLM_F_ACK)
+
+	msg := nl.NewIfInfomsg(unix.AF_UNSPEC)
+	msg.Index = int32(base.Index)
+	req.AddData(msg)
+
+	b := make([]byte, 4)
+	native.PutUint32(b, OperUp)
+
+	data := nl.NewRtAttr(unix.IFLA_OPERSTATE, b)
+	req.AddData(data)
+
+	_, err := req.Execute(unix.NETLINK_ROUTE, 0)
+	return err
+}

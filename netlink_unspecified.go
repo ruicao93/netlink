@@ -1,3 +1,4 @@
+//go:build !linux
 // +build !linux
 
 package netlink
@@ -254,4 +255,8 @@ func NeighDeserialize(m []byte) (*Neigh, error) {
 
 func SocketGet(local, remote net.Addr) (*Socket, error) {
 	return nil, ErrNotImplemented
+}
+
+func LinkSetOperStateUp(link Link) error {
+	return ErrNotImplemented
 }
